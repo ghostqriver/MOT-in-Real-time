@@ -13,4 +13,4 @@ def read_video_info(video_path):
     print('Frames:',int(frames))
     print('Size:',int(width),'*',int(height))
     print('FPS:',fps)
-    return Frames,(width,height),fps
+    return frames,(width,height),fps
