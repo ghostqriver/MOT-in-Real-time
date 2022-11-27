@@ -11,4 +11,7 @@ def fps_from_log(log_path='log.txt'):
     text = file.read().replace('\n', '')
   log_fps_s = re.findall(r'\(\d+\.\d+\sfps\)', text)
   log_fps_s = list(map(lambda x : float(re.findall('\d+.\d+',x)[0]),log_fps_s))
-  return sum(log_fps_s[1:])/len(log_fps_s[1:])
+
+  avg_fps = sum(log_fps_s[1:])/len(log_fps_s[1:])
+  print('The average fps is',avg_fps)
+  return avg_fps 
