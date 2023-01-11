@@ -14,9 +14,9 @@ class GT:
         print('Bounding boxes:',self.df.index.max())
         
     def save_gt(self):
-        self.df.to_csv(file_name.split('.')[0]+'_processed.txt',header=0,index=0)
+        self.df.to_csv(self.file_name.split('.')[0]+'_processed.txt',header=0,index=0)
         
     def rm_frame(self,frame_id):
         indexes = np.array(self.df.index)[self.df['frame_id']==frame_id]
-        gt.df.drop(indexes,inplace=True)
+        self.df.drop(indexes,inplace=True)
         print('Removed',len(indexes),'labels in frame',frame_id)
