@@ -2,6 +2,8 @@ import cv2 as cv
 import numpy as np
 import glob
 import time
+import tqdm
+
 
 def read_video_info(video_path):
     '''
@@ -19,10 +21,31 @@ def read_video_info(video_path):
     return frames,(width,height),fps
 
 
+def frame2video(frame_path,file_name=None):
+    
+    if file_name == None:
+        file_name = frame_path+'.mp4'
+        
+    frames = glob.glob(frame_path+'/*.jpg')
+    
+    img0 = cv.imread(frames[0])
+    
+    
+    height,width = img0.shape[:2]
+    
+    video_writer = cv.VideoWriter(file_name, fourcc=cv.VideoWriter_fourcc(*"mp4v"), fps=30, frameSize=(width, height), isColor=True)
+    
+    for frame in tqdm.tqdm(frames):
+        
+        img = cv.imread(frame)
 
-
-
-
+        video_writer.write(img)
+    
+    video_writer.release()
+    
+    print('Saved video as',file_name)
+    
+    return file_name
 
 
 def reduce_video_framerate(input,desired_framerate,samelength):
