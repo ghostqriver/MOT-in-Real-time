@@ -31,7 +31,27 @@ class ARGS():
 args = ARGS()
 
 
-def pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True):
+class GT:
+    def __init__(self,file_name):
+        self.file_name = file_name
+        self.read_gt()
+        
+    def read_gt(self):
+        self.df = pd.read_csv(self.file_name,names=['frame_id','Trajectory_id','bbox_1','bbox_2','bbox_3','bbox_4','confidence','class','vis_ratio'])    
+        print('In ground Truth')
+        print('Trajectories:',self.df['Trajectory_id'].values.max())
+        print('Bounding boxes:',self.df.index.max())
+        
+    def save_gt(self):
+        self.df.to_csv(self.file_name.split('.')[0]+'_processed.txt',header=0,index=0)
+        
+    def rm_frame(self,frame_id):
+        indexes = np.array(self.df.index)[self.df['frame_id']==frame_id]
+        self.df.drop(indexes,inplace=True)
+        print('Removed',len(indexes),'labels in frame',frame_id)
+
+
+def pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True,drop_each_frame=0):
     '''
     exp_file: expriment description file
     ckpt: the model, we might use pretrained/bytetrack_?_mot17.pth.tar
@@ -70,16 +90,19 @@ def pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True):
     predictor = Predictor(model, exp, trt_file, decoder,device,fp16) # predictor
     current_time = time.localtime() # read current time
 
-    imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp)
+    imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp, drop_each_frame)
 
 
-def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp): 
+def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp, drop_each_frame=0): 
     
     # read video info
     cap = cv2.VideoCapture(video_path)
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
     fps = cap.get(cv2.CAP_PROP_FPS) # read the FPS of video
+    
+    # read gt
+    gt = GT(gt_path)
     
     # save path
     timestamp = time.strftime("%Y_%m_%d_%H_%M_%S", current_time)
@@ -95,20 +118,22 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
     
     tracker = BYTETracker(args, frame_rate=30) # use the global variable args
     timer = Timer()
-    frame_id = 0 # initialize the frame id
+    frame_id = 0 + 1 # initialize the frame id +1 because gt's frame id start from 1
     results = []
-    
+   
     while True:
         
         if frame_id % 20 == 0:
             logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1. / max(1e-5, timer.average_time))) # 
         
-        # if frame_id % 2 == 0:
-            
-            
-            
-        #     timer.toc() 
-        #     break
+        
+        # Process the video
+        # remove one each drop_each_frame
+        if drop_each_frame > 0 :        
+            if frame_id % drop_each_frame  == 0:
+                timer.toc()
+                gt.rm_frame(frame_id)
+                break
         
         # Process the video
         # E.g. when drop the frame_id 2 then the ground truth of frame 2 should also be droped
@@ -118,11 +143,17 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
         
         # Process the video
             
-        ret_val, frame = cap.read()
+        ret_val, frame = cap.read() 
         
         if ret_val: 
+        '''
+        if there are still frames in the video
+        '''
             outputs, img_info = predictor.inference(frame, timer) # maybe modify the model here
             if outputs[0] is not None:
+                '''
+                if detected, then BYTETracker
+                '''
                 online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], exp.test_size)
                 online_tlwhs = []
                 online_ids = []
@@ -141,24 +172,37 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
                 timer.toc() # returns time from last tic or from initialization
                 online_im = plot_tracking(
                     img_info['raw_img'], online_tlwhs, online_ids, frame_id=frame_id + 1, fps=1. / timer.average_time
-                )
+                ) # plot the track on image
             else:
+                '''
+                nothing detected at all
+                '''
                 timer.toc() # total_time += diff, calls + 1 update the average 
                 online_im = img_info['raw_img']
      
-            vid_writer.write(online_im)
-            ch = cv2.waitKey(1)
+            vid_writer.write(online_im) # write into video
+            ch = cv2.waitKey(1) # wait for the key board
             if ch == 27 or ch == ord("q") or ch == ord("Q"):
                 break
         else:
+        '''
+        if nothing in the video
+        '''
             break
+            
         frame_id += 1
 
-
+    # calc average FPS
+    avg_FPS = 1. / max(1e-5, timer.average_time)
+    
+    # save output
     res_file = osp.join(vis_folder, f"{timestamp}.txt")
     with open(res_file, 'w') as f:
         f.writelines(results)
     logger.info(f"save results to {res_file}")
+    
+    
+    return res_file,avg_FPS
 
 
 class Predictor(object):
