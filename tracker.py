@@ -25,6 +25,7 @@ class ARGS():
         self.track_thresh = .5
         self.match_thresh = .8
         self.track_buffer = 30
+        self.aspect_ratio_thresh = 1.6
         self.mot20 = False
 
 args = ARGS()
@@ -129,8 +130,8 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
                 for t in online_targets:
                     tlwh = t.tlwh
                     tid = t.track_id
-                    vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
-                    if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
+                    vertical = tlwh[2] / tlwh[3] > 1.6
+                    if tlwh[2] * tlwh[3] > 10 and not vertical:
                         online_tlwhs.append(tlwh)
                         online_ids.append(tid)
                         online_scores.append(t.score)
@@ -144,8 +145,8 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
             else:
                 timer.toc() # total_time += diff, calls + 1 update the average 
                 online_im = img_info['raw_img']
-            if args.save_result:
-                vid_writer.write(online_im)
+     
+            vid_writer.write(online_im)
             ch = cv2.waitKey(1)
             if ch == 27 or ch == ord("q") or ch == ord("Q"):
                 break
@@ -153,11 +154,11 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
             break
         frame_id += 1
 
-    if args.save_result:
-        res_file = osp.join(vis_folder, f"{timestamp}.txt")
-        with open(res_file, 'w') as f:
-            f.writelines(results)
-        logger.info(f"save results to {res_file}")
+
+    res_file = osp.join(vis_folder, f"{timestamp}.txt")
+    with open(res_file, 'w') as f:
+        f.writelines(results)
+    logger.info(f"save results to {res_file}")
 
 
 class Predictor(object):

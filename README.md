@@ -36,3 +36,6 @@ video_path = # your video path
 gt_path = # your gt path
 tracker.pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True)
 ```
+
+## Colab example
+![Open In Colab](https://colab.research.google.com/drive/1w_4PgAOQ-biOVtb2UCGuL2stxI_eCBpu?usp=sharing)
