@@ -11,6 +11,7 @@ The project's goal is to improve the [bytetrack](https://github.com/ifzhang/Byte
 !pip3 install cython
 !pip3 install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
 !pip3 install cython_bbox
+!pip3 install motmetrics
 
 !git clone https://github.com/ifzhang/ByteTrack.git
 
@@ -36,6 +37,11 @@ video_path = # your video path
 gt_path = # your gt path
 tracker.pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True)
 ```
+4. Calculate metrics
+
+  After populating an accumulator via providing the ground truth file path and the output result file path, a big variety of multiple object tracking metrics (available to list via the ```list_available_metrics``` method) can be calculated through ```yield_metrics_from_accumulator``` in ```calc_metrics.py```
+
 
 ## Colab example
+
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1w_4PgAOQ-biOVtb2UCGuL2stxI_eCBpu?usp=sharing)
