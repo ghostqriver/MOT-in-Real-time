@@ -69,10 +69,10 @@ def pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True):
     predictor = Predictor(model, exp, trt_file, decoder,device,fp16) # predictor
     current_time = time.localtime() # read current time
 
-    imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path,)
+    imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp)
 
 
-def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path): 
+def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp): 
     
     # read video info
     cap = cv2.VideoCapture(video_path)
