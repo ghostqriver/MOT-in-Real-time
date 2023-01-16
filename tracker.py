@@ -8,7 +8,8 @@ import os.path as osp
 import time
 import cv2
 import torch
-
+import pandas as pd
+import numpy as np
 from loguru import logger
 
 from yolox.data.data_augment import preproc
@@ -48,7 +49,7 @@ class GT:
     def rm_frame(self,frame_id):
         indexes = np.array(self.df.index)[self.df['frame_id']==frame_id]
         self.df.drop(indexes,inplace=True)
-        print('Removed',len(indexes),'labels in frame',frame_id)
+        # print('Removed',len(indexes),'labels in frame',frame_id)
 
 
 def pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True,drop_each_frame=0):
@@ -90,7 +91,7 @@ def pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True,drop_each_fr
     predictor = Predictor(model, exp, trt_file, decoder,device,fp16) # predictor
     current_time = time.localtime() # read current time
 
-    imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp, drop_each_frame)
+    return imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp, drop_each_frame)
 
 
 def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp, drop_each_frame=0): 
@@ -120,7 +121,7 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
     timer = Timer()
     frame_id = 0 + 1 # initialize the frame id +1 because gt's frame id start from 1
     results = []
-   
+    time_start = time.time()
     while True:
         
         if frame_id % 20 == 0:
@@ -131,9 +132,11 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
         # remove one each drop_each_frame
         if drop_each_frame > 0 :        
             if frame_id % drop_each_frame  == 0:
+                ret_val, frame = cap.read() 
                 timer.toc()
                 gt.rm_frame(frame_id)
-                break
+                frame_id += 1
+                continue
         
         # Process the video
         # E.g. when drop the frame_id 2 then the ground truth of frame 2 should also be droped
@@ -146,9 +149,9 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
         ret_val, frame = cap.read() 
         
         if ret_val: 
-        '''
-        if there are still frames in the video
-        '''
+            '''
+            if there are still frames in the video
+            '''
             outputs, img_info = predictor.inference(frame, timer) # maybe modify the model here
             if outputs[0] is not None:
                 '''
@@ -185,22 +188,22 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
             if ch == 27 or ch == ord("q") or ch == ord("Q"):
                 break
         else:
-        '''
-        if nothing in the video
-        '''
+            '''
+            if nothing in the video
+            '''
             break
             
         frame_id += 1
 
     # calc average FPS
-    avg_FPS = 1. / max(1e-5, timer.average_time)
-    
+    # avg_FPS = 1. / max(1e-5, timer.average_time)
+    time_end = time.time()
+    avg_FPS = (time_end - time_start)/fps
     # save output
     res_file = osp.join(vis_folder, f"{timestamp}.txt")
     with open(res_file, 'w') as f:
         f.writelines(results)
     logger.info(f"save results to {res_file}")
-    
     
     return res_file,avg_FPS
 
