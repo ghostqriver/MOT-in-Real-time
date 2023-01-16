@@ -24,8 +24,13 @@ def yield_metrics_from_accumulator(accumulator, metrics=None, all_metrics=False)
         summary = mh.compute(accumulator,
                              metrics=metrics,
                              name='acc')
+    str_summary = mm.io.render_summary(
+        summary,
+        formatters=mh.formatters,
+        namemap=mm.io.motchallenge_metric_names
+    )
 
-    return summary
+    return str_summary
 
 
 gt_file_p = open("gt.txt", "r")
