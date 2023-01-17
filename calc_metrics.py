@@ -14,10 +14,8 @@ def populate_accumulator(gt_file_path, calculated_output_file_path):
     return mm.utils.compare_to_groundtruth(gt, ts, 'iou', distth=0.5)
 
 
-def calculate_metrics(metrics=None, all_metrics=False):
-    accumulator = populate_accumulator("gt.txt", "sample_output.txt")
-    if metrics is None:
-        metrics = ['num_frames', 'mota', 'motp']
+def get_summary_and_mh(output_file, metrics, all_metrics=False):
+    accumulator = populate_accumulator("gt.txt", output_file)
     mh = mm.metrics.create()
 
     if all_metrics:
@@ -30,8 +28,24 @@ def calculate_metrics(metrics=None, all_metrics=False):
     return summary, mh
 
 
-def yield_metrics_string_from_accumulator(all_metrics=False):
-    summary, mh = calculate_metrics(all_metrics)
+def calculate_metrics_for_output(output_file, metrics=None, all_metrics=False):
+    if metrics is None:
+        metrics = ['num_frames', 'mota', 'motp']
+
+    summary, _ = get_summary_and_mh(output_file, metrics, all_metrics)
+
+    if all_metrics:
+        metrics = list_available_metrics()
+
+    metric_list = []
+    for metric in metrics:
+        metric_list.append(summary[metric]['acc'])
+
+    return metric_list
+
+
+def yield_metrics_summary_from_accumulator(output_file, metrics):
+    summary, mh = get_summary_and_mh(output_file, metrics)
     str_summary = mm.io.render_summary(
         summary,
         formatters=mh.formatters,
@@ -41,14 +55,14 @@ def yield_metrics_string_from_accumulator(all_metrics=False):
     return str_summary
 
 
-def plot_results(original, enhanced):
-    data = [original, enhanced]
-    X = np.arange(len(original))
+def plot_results(original_model_results, enhanced_model_results, metric_names):
+    data = [original_model_results, enhanced_model_results]
+    X = np.arange(len(original_model_results))
+    plt.title('Scores')
     plt.bar(X + 0.00, data[0], color='b', width=0.25)
     plt.bar(X + 0.25, data[1], color='g', width=0.25)
     plt.xlabel('Metrics')
-    plt.xticks(np.arange(len(original)) + 0.125, ['mota', 'motp'])
-    plt.title('Scores')
+    plt.xticks(np.arange(len(original_model_results)) + 0.125, metric_names)
     plt.show()
 
 
@@ -60,9 +74,8 @@ sample_p = open("sample_output.txt", "r")
 sample = sample_p.read()
 print(sample[:100])
 
-print(list_available_metrics())
+print(yield_metrics_summary_from_accumulator("sample_output.txt", list_available_metrics()))
 
-metrics_summary, _ = calculate_metrics(all_metrics=True)
-
-mota_motp_metrics = [metrics_summary['mota']['acc'], metrics_summary['motp']['acc']]
-plot_results(mota_motp_metrics, mota_motp_metrics)
+plot_results(calculate_metrics_for_output("sample_output.txt", all_metrics=True),
+             calculate_metrics_for_output("sample_output.txt", all_metrics=True),
+             list_available_metrics())
