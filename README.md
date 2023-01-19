@@ -27,7 +27,7 @@ The project's goal is to improve the [bytetrack](https://github.com/ifzhang/Byte
 !cp 'tracker.py' '/content/ByteTrack/tools'
 ```
 
-3. Use our defined video predictor
+3.(a) Use our defined video predictor
 ```shell
 %cd /ByteTrack
 import tools.tracker as tracker
@@ -37,6 +37,18 @@ video_path = # your video path
 gt_path = # your gt path
 tracker.pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True)
 ```
+3.(b) Use our video processor to reduce training and inference time for bytetrack by reducing the framerate of the videos
+from video_process import VideoPreprocessor
+
+vp = VideoPreprocessor()
+train_folder = 'path/to/train/set' # Works on set of videos
+test_video = 'path/to/test/video'  # and individual videos as well
+target_fps = 15 # reduce the original 30 fps videos to 15 fps
+train_output_dict = vp.process_folder(train_folder, target_fps)  
+test_output = vp.process_video(test_video, target_ps)
+...
+  run the bytetrack on the results
+...
 4. Calculate metrics
 
   After populating an accumulator via providing the ground truth file path and the output result file path, a big variety of multiple object tracking metrics (available to list via the ```list_available_metrics``` method) can be calculated through ```yield_metrics_from_accumulator``` in ```calc_metrics.py```

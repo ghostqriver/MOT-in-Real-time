@@ -121,7 +121,7 @@ class VideoPreprocessor():
 
         cap.release()
         out.release()
-        #cv.destroyAllWindows()
+        
         print(f'Reduced the FPS from {original_fps} to {desired_fps}')
         frames_to_remove = [x for x in range(f_count) if x not in frames_to_store]
         gt_out_file = None
