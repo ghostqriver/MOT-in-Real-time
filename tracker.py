@@ -44,8 +44,11 @@ class GT:
         print('Bounding boxes:',self.df.index.max())
         
     def save_gt(self):
-        self.df.to_csv(self.file_name.split('.')[0]+'_processed.txt',header=0,index=0)
-        
+        save_file = self.file_name.split('.')[0]+'_processed.txt'
+        self.df.to_csv(save_file,header=0,index=0)
+        print('Processed ground truth saved to',save_file)
+        return save_file
+
     def rm_frame(self,frame_id):
         indexes = np.array(self.df.index)[self.df['frame_id']==frame_id]
         self.df.drop(indexes,inplace=True)
@@ -200,14 +203,16 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
     avg_FPS = 1. / max(1e-5, timer.average_time)
     # time_end = time.time()
     # avg_FPS = fps/(time_end - time_start)
-    
+
     # save output
-    res_file = osp.join(vis_folder, f"{timestamp}.txt")
-    with open(res_file, 'w') as f:
+    pred_file = osp.join(vis_folder, f"{timestamp}.txt")
+    with open(pred_file, 'w') as f:
         f.writelines(results)
-    logger.info(f"save results to {res_file}")
+    logger.info(f"save results to {pred_file}")
     
-    return res_file,avg_FPS
+    # save gt
+    processed_gt = gt.save_gt()
+    return pred_file,processed_gt,avg_FPS
 
 
 class Predictor(object):
