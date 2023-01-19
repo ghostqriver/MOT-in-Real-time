@@ -29,6 +29,7 @@ class VideoPreprocessor():
         print('Frames:',int(frames))
         print('Size:',int(width),'*',int(height))
         print('FPS:',fps)
+        print('Duration:',duration)
         return frames,(width,height),fps,duration
 
 

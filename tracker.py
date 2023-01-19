@@ -121,7 +121,7 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
     timer = Timer()
     frame_id = 0 + 1 # initialize the frame id +1 because gt's frame id start from 1
     results = []
-    time_start = time.time()
+    # time_start = time.time()
     while True:
         
         if frame_id % 20 == 0:
@@ -132,10 +132,11 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
         # remove one each drop_each_frame
         if drop_each_frame > 0 :        
             if frame_id % drop_each_frame  == 0:
+                timer.tic() # simulate start the detecting
                 ret_val, frame = cap.read() 
-                timer.toc()
                 gt.rm_frame(frame_id)
                 frame_id += 1
+                timer.toc() # simulate over the tracking
                 continue
         
         # Process the video
@@ -196,9 +197,10 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
         frame_id += 1
 
     # calc average FPS
-    # avg_FPS = 1. / max(1e-5, timer.average_time)
-    time_end = time.time()
-    avg_FPS = (time_end - time_start)/fps
+    avg_FPS = 1. / max(1e-5, timer.average_time)
+    # time_end = time.time()
+    # avg_FPS = fps/(time_end - time_start)
+    
     # save output
     res_file = osp.join(vis_folder, f"{timestamp}.txt")
     with open(res_file, 'w') as f:
