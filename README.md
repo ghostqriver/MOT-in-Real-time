@@ -39,7 +39,7 @@ tracker.pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True)
 ```
 3.(b) Use our video processor to reduce training and inference time for bytetrack by reducing the framerate of the videos
 from video_process import VideoPreprocessor
-
+```shell
 vp = VideoPreprocessor()
 train_folder = 'path/to/train/set' # Works on set of videos
 test_video = 'path/to/test/video'  # and individual videos as well
@@ -49,6 +49,7 @@ test_output = vp.process_video(test_video, target_ps)
 ...
   run the bytetrack on the results
 ...
+```
 4. Calculate metrics
 
   After populating an accumulator via providing the ground truth file path and the output result file path, a big variety of multiple object tracking metrics (available to list via the ```list_available_metrics``` method) can be calculated through ```yield_metrics_from_accumulator``` in ```calc_metrics.py```
