@@ -14,8 +14,8 @@ def populate_accumulator(gt_file_path, calculated_output_file_path):
     return mm.utils.compare_to_groundtruth(gt, ts, 'iou', distth=0.5)
 
 
-def get_summary_and_mh(output_file, metrics, all_metrics=False):
-    accumulator = populate_accumulator("gt.txt", output_file)
+def get_summary_and_mh(gt_file, output_file, metrics, all_metrics=False):
+    accumulator = populate_accumulator(gt_file, output_file)
     mh = mm.metrics.create()
 
     if all_metrics:
@@ -28,11 +28,11 @@ def get_summary_and_mh(output_file, metrics, all_metrics=False):
     return summary, mh
 
 
-def calculate_metrics_for_output(output_file, metrics=None, all_metrics=False):
+def calculate_metrics_for_output(gt_file, output_file, metrics=None, all_metrics=False):
     if metrics is None:
         metrics = ['num_frames', 'mota', 'motp']
 
-    summary, _ = get_summary_and_mh(output_file, metrics, all_metrics)
+    summary, _ = get_summary_and_mh(gt_file, output_file, metrics, all_metrics)
 
     if all_metrics:
         metrics = list_available_metrics()
@@ -44,8 +44,8 @@ def calculate_metrics_for_output(output_file, metrics=None, all_metrics=False):
     return metric_list
 
 
-def yield_metrics_summary_from_accumulator(output_file, metrics):
-    summary, mh = get_summary_and_mh(output_file, metrics)
+def yield_metrics_summary_from_accumulator(gt_file, output_file, metrics):
+    summary, mh = get_summary_and_mh(gt_file, output_file, metrics)
     str_summary = mm.io.render_summary(
         summary,
         formatters=mh.formatters,
@@ -55,8 +55,8 @@ def yield_metrics_summary_from_accumulator(output_file, metrics):
     return str_summary
 
 
-def plot_results(original_model_results, enhanced_model_results, metric_names):
-    data = [original_model_results, enhanced_model_results]
+def plot_results(original_model_results, fps_enhanced_model_results, metric_names):
+    data = [original_model_results, fps_enhanced_model_results]
     X = np.arange(len(original_model_results))
     plt.title('Scores')
     plt.bar(X + 0.00, data[0], color='b', width=0.25)
@@ -74,8 +74,9 @@ sample_p = open("sample_output.txt", "r")
 sample = sample_p.read()
 print(sample[:100])
 
-print(yield_metrics_summary_from_accumulator("sample_output.txt", list_available_metrics()))
+print(yield_metrics_summary_from_accumulator("gt.txt", "sample_output.txt", list_available_metrics()))
 
-plot_results(calculate_metrics_for_output("sample_output.txt", all_metrics=True),
-             calculate_metrics_for_output("sample_output.txt", all_metrics=True),
+plot_results(calculate_metrics_for_output("gt.txt", "sample_output.txt", all_metrics=True),
+             calculate_metrics_for_output("Yizhi_pred_outputs/gt_processed_drop_each_frame_2.txt",
+                                          "Yizhi_pred_outputs/2023_01_19_12_00_49.txt", all_metrics=True),
              list_available_metrics())

@@ -50,9 +50,15 @@ test_output = vp.process_video(test_video, target_ps)
   run the bytetrack on the results
 ...
 ```
-4. Calculate metrics
+4. Calculate and plot metrics
 
-  After populating an accumulator via providing the ground truth file path and the output result file path, a big variety of multiple object tracking metrics (available to list via the ```list_available_metrics``` method) can be calculated through ```yield_metrics_from_accumulator``` in ```calc_metrics.py```
+  To calculate some multiple object tracking metrics and to plot the calculation results, use the ```calculate_metrics_for_output``` and the ```plot_results``` method accordingly, from ```calc_metrics.py``` . The metrics have been aligned with what is reported by [MOTChallenge](https://motchallenge.net/) benchmarks. In the metric calculation procedure the ```motmetrics``` open source, third party library was used. Link to repo: https://github.com/cheind/py-motmetrics . For plotting,  the popular```matplotlib``` library was used. Link to repo: https://github.com/matplotlib/matplotlib .
+
+The ```calculate_metrics_for_output``` method requires two input parameters, one for the ground truth file and one for the model's calculated output file. Optionally, one can provide a list of the desired metrics or set true for the ```all_metrics``` boolean parameter to yield all the available metrics. 
+
+The ```plot_results``` method requires three parameter inputs: the calculated metrics for two models (e.g. the original one and an FPS enhanced one) and a list of the to-be-plotted metrics.
+
+
 
 
 ## Colab example
