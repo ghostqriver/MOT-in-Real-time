@@ -55,11 +55,56 @@ class GT:
         # print('Removed',len(indexes),'labels in frame',frame_id)
 
 
-def pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True,drop_each_frame=0):
+def get_sta_ids(video_path,sta_thres):
+
+    camera = cv2.VideoCapture(video_path) 
+    length = camera.get(cv2.CAP_PROP_FRAME_COUNT)
+
+    (ret, lastFrame) = camera.read() # 1st
+
+    lastFrame =  cv2.resize(cv2.cvtColor(lastFrame,cv2.COLOR_BGR2GRAY),[200,200])
+
+    diff_list = []
+
+    while camera.isOpened(): 
+
+        (ret, frame) = camera.read() 
+
+        if not ret: 
+            break 
+
+        frame = cv2.resize(cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY),[200,200])
+
+        diff = frame - lastFrame # 2nd - 1st -> diff[0] -> diff[0] is the change of frame 2 -> id+2
+
+        diff_abs = cv2.convertScaleAbs(diff)
+
+        diff_list.append(diff_abs.mean())
+
+        lastFrame = frame.copy() 
+
+    diff_thres = np.sort(diff_list)[int(length * thres)]
+
+    sta_frame_ids = []
+
+    for id,diff in enumerate(diff_list):
+
+        if diff < diff_thres:
+
+            sta_frame_ids.append(id+2)
+
+    return sta_frame_ids
+
+
+def pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True,drop_each_frame=0,sta_thres=0):
     '''
     exp_file: expriment description file
     ckpt: the model, we might use pretrained/bytetrack_?_mot17.pth.tar
     '''
+    if drop_each_frame!=0 and sta_thres!=0:
+        logger.info("Only one of drop_each_frame or sta_thres could be  greater than 0".format(get_model_info(model, exp.test_size)))
+    
+    
     # get exp description file, model name set to be none
     exp = get_exp(exp_file, None)
     # make output and vis folder
@@ -94,10 +139,10 @@ def pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True,drop_each_fr
     predictor = Predictor(model, exp, trt_file, decoder,device,fp16) # predictor
     current_time = time.localtime() # read current time
 
-    return imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp, drop_each_frame)
+    return imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp, drop_each_frame,sta_thres)
 
 
-def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp, drop_each_frame=0): 
+def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp, drop_each_frame=0,sta_thres=0): 
     
     # read video info
     cap = cv2.VideoCapture(video_path)
@@ -119,12 +164,19 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
         save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
     )
 
-    
+    # initialize the tracker and timer
     tracker = BYTETracker(args, frame_rate=30) # use the global variable args
     timer = Timer()
     frame_id = 0 + 1 # initialize the frame id +1 because gt's frame id start from 1
     results = []
     # time_start = time.time()
+
+    # get static frame ids
+    if sta_thres > 0:
+        timer.tic() # the static frames calculation time should be contained into the process time
+        sta_frame_ids = get_sta_ids(video_path,sta_thres)
+        timer.toc() 
+    
     while True:
         
         if frame_id % 20 == 0:
@@ -143,10 +195,15 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
                 continue
         
         # Process the video
-        # E.g. when drop the frame_id 2 then the ground truth of frame 2 should also be droped
-        # 1. send the GT into this function
-        # 2. send the method select and parameters into this function
-        # 
+        # remove all the static frame
+        if sta_thres > 0:
+            if   frame_id in sta_frame_ids:
+                timer.tic() # simulate start the detecting
+                ret_val, frame = cap.read() 
+                gt.rm_frame(frame_id)
+                frame_id += 1
+                timer.toc() # simulate over the tracking
+                continue
         
         # Process the video
             
