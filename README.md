@@ -4,6 +4,8 @@ This repo is the project for AML subject in ELTE.
 
 The project's goal is to improve the [bytetrack](https://github.com/ifzhang/ByteTrack) 's prediction real time performance (FPS>30).
 
+Get access to our team [report](https://docs.google.com/document/d/1CL5NLqxpi42jAJE1RuJuDSf8qFIHfQXw/edit?usp=sharing&ouid=109729230889422611512&rtpof=true&sd=true).
+
 ## How to use
 
 1. Install bytetrack & dependencies
@@ -27,15 +29,20 @@ The project's goal is to improve the [bytetrack](https://github.com/ifzhang/Byte
 !cp 'tracker.py' '/content/ByteTrack/tools'
 ```
 
-3.(a) Use our defined video predictor
+3.(a) Use our defined video predictor + frame reduce function
+There are two important parameters 
+'''drop_each_frame''': integer, when > 0, the frame would be reduced each '''drop_each_frame''' frames.
+'''sta_thres''': float (0,1), when > 0, intotal '''sta_thres''' * total frames number of most static frames would be reduced.
+note that '''drop_each_frame''' and '''sta_thres''' could not > 0 at the same time.
 ```shell
 %cd /ByteTrack
 import tools.tracker as tracker
+
 exp_file = 'exps/example/mot/yolox_s_mix_det.py'
 ckpt = 'pretrained/bytetrack_s_mot17.pth.tar'
 video_path = # your video path
 gt_path = # your gt path
-tracker.pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True)
+pred_file,processed_gt,avg_FPS = tracker.pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True,drop_each_frame=0,sta_thres=0.5)
 ```
 3.(b) Use our video processor to reduce training and inference time for bytetrack by reducing the framerate of the videos
 from video_process import VideoPreprocessor
@@ -45,7 +52,7 @@ train_folder = 'path/to/train/set' # Works on set of videos
 test_video = 'path/to/test/video'  # and individual videos as well
 target_fps = 15 # reduce the original 30 fps videos to 15 fps
 train_output_dict = vp.process_folder(train_folder, target_fps)  
-test_output = vp.process_video(test_video, target_ps)
+test_output = vp.process_video(test_video, target_fps)
 ...
   run the bytetrack on the results
 ...
