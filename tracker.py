@@ -62,7 +62,7 @@ def get_sta_ids(video_path,sta_thres):
 
     (ret, lastFrame) = camera.read() # 1st
 
-    lastFrame =  cv2.resize(cv2.cvtColor(lastFrame,cv2.COLOR_BGR2GRAY),fx=0.1,fy=0.1)
+    lastFrame =  cv2.resize(cv2.cvtColor(lastFrame,cv2.COLOR_BGR2GRAY),None,fx=0.1,fy=0.1)
 
     diff_list = []
 
@@ -73,7 +73,7 @@ def get_sta_ids(video_path,sta_thres):
         if not ret: 
             break 
 
-        frame = cv2.resize(cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY),fx=0.1,fy=0.1)
+        frame = cv2.resize(cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY),None,fx=0.1,fy=0.1)
 
         diff = frame - lastFrame # 2nd - 1st -> diff[0] -> diff[0] is the change of frame 2 -> id+2
 
