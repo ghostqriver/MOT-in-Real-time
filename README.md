@@ -31,8 +31,11 @@ Get access to our team [report](https://docs.google.com/document/d/1CL5NLqxpi42j
 
 3.(a) Use our defined video predictor + frame reduce function
 There are two important parameters 
+
 ```drop_each_frame```: integer, when > 0, the frame would be reduced each ```drop_each_frame``` frames.
+
 ```sta_thres```: float (0,1), when > 0, intotal ```sta_thres``` * total frames number of most static frames would be reduced.
+
 note that ```drop_each_frame``` and ```sta_thres``` could not > 0 at the same time.
 ```shell
 %cd /ByteTrack
