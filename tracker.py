@@ -62,7 +62,7 @@ def get_sta_ids(video_path,sta_thres):
 
     (ret, lastFrame) = camera.read() # 1st
 
-    lastFrame =  cv2.resize(cv2.cvtColor(lastFrame,cv2.COLOR_BGR2GRAY),[200,200])
+    lastFrame =  cv2.resize(cv2.cvtColor(lastFrame,cv2.COLOR_BGR2GRAY),fx=0.1,fy=0.1)
 
     diff_list = []
 
@@ -73,7 +73,7 @@ def get_sta_ids(video_path,sta_thres):
         if not ret: 
             break 
 
-        frame = cv2.resize(cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY),[200,200])
+        frame = cv2.resize(cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY),fx=0.1,fy=0.1)
 
         diff = frame - lastFrame # 2nd - 1st -> diff[0] -> diff[0] is the change of frame 2 -> id+2
 
@@ -83,7 +83,7 @@ def get_sta_ids(video_path,sta_thres):
 
         lastFrame = frame.copy() 
 
-    diff_thres = np.sort(diff_list)[int(length * thres)]
+    diff_thres = np.sort(diff_list)[int(length * sta_thres)]
 
     sta_frame_ids = []
 
@@ -173,9 +173,9 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
 
     # get static frame ids
     if sta_thres > 0:
-        timer.tic() # the static frames calculation time should be contained into the process time
+        # timer.tic() # the static frames calculation time should be contained into the process time
         sta_frame_ids = get_sta_ids(video_path,sta_thres)
-        timer.toc() 
+        # timer.toc() 
     
     while True:
         
