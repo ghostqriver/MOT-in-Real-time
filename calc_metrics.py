@@ -66,17 +66,17 @@ def plot_results(original_model_results, fps_enhanced_model_results, metric_name
     plt.show()
 
 
-gt_file_p = open("gt.txt", "r")
-gt_file = gt_file_p.read()
-print(gt_file[:100])
-
-sample_p = open("sample_output.txt", "r")
-sample = sample_p.read()
-print(sample[:100])
-
-print(yield_metrics_summary_from_accumulator("gt.txt", "sample_output.txt", list_available_metrics()))
-
-plot_results(calculate_metrics_for_output("gt.txt", "sample_output.txt", all_metrics=True),
-             calculate_metrics_for_output("Yizhi_pred_outputs/gt_processed_drop_each_frame_2.txt",
-                                          "Yizhi_pred_outputs/2023_01_19_12_00_49.txt", all_metrics=True),
-             list_available_metrics())
+# gt_file_p = open("gt.txt", "r")
+# gt_file = gt_file_p.read()
+# print(gt_file[:100])
+#
+# sample_p = open("sample_output.txt", "r")
+# sample = sample_p.read()
+# print(sample[:100])
+#
+# print(yield_metrics_summary_from_accumulator("gt.txt", "sample_output.txt", list_available_metrics()))
+#
+# plot_results(calculate_metrics_for_output("gt.txt", "sample_output.txt", ['mota', 'motp', 'idf1']),
+#              calculate_metrics_for_output("Yizhi_pred_outputs/gt_processed_drop_each_frame_2.txt",
+#                                           "Yizhi_pred_outputs/2023_01_19_12_00_49.txt", ['mota', 'motp', 'idf1']),
+#              ['mota', 'motp', 'idf1'])
