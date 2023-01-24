@@ -1,6 +1,4 @@
-'''
-Copy this file under ByteTrack/tools/, * same folder to demo_track.py
-'''
+
 
 import argparse
 import os
@@ -30,6 +28,15 @@ class ARGS():
         self.match_thresh = .8
         self.track_buffer = 30
         self.aspect_ratio_thresh = 1.6
+        self.track_high_thresh = 0.6
+        self.track_low_thresh = 0.1
+        self.new_track_thresh = 0.7
+        self.proximity_thresh = 0.5
+        self.appearance_thresh = 0.25
+        self.with_reid = False
+        self.cmc_method = "orb"
+        self.name = None
+        self.ablation = False
         self.mot20 = False
 
 args = ARGS()
@@ -65,7 +72,7 @@ def get_sta_ids(video_path,sta_thres):
 
     (ret, lastFrame) = camera.read() # 1st
 
-    lastFrame =  cv2.resize(cv2.cvtColor(lastFrame,cv2.COLOR_BGR2GRAY),fx=0.1,fy=0.1)
+    lastFrame =  cv2.resize(cv2.cvtColor(lastFrame,cv2.COLOR_BGR2GRAY),[200,200])
 
     diff_list = []
 
@@ -76,7 +83,7 @@ def get_sta_ids(video_path,sta_thres):
         if not ret: 
             break 
 
-        frame = cv2.resize(cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY),fx=0.1,fy=0.1)
+        frame = cv2.resize(cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY),[200,200])
 
         diff = frame - lastFrame # 2nd - 1st -> diff[0] -> diff[0] is the change of frame 2 -> id+2
 
