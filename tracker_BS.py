@@ -130,6 +130,11 @@ def pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True,drop_each_fr
     model = exp.get_model().to(device)
     logger.info("Model Summary: {}".format(get_model_info(model, exp.test_size)))
     model.eval()
+    logger.info("loading checkpoint")
+    ckpt = torch.load(ckpt, map_location="cpu")
+    # load the model state dict
+    model.load_state_dict(ckpt["model"])
+    logger.info("loaded checkpoint done.")
 
 
     if fuse == True:
@@ -223,6 +228,7 @@ def imageflow_demo(predictor, vis_folder, current_time, video_path, gt_path, exp
             outputs, img_info = predictor.inference(frame, timer)
             scale = min(exp.test_size[0] / float(img_info['height'], ), exp.test_size[1] / float(img_info['width']))
 
+            detections = []
             if outputs[0] is not None:
                 outputs = outputs[0].cpu().numpy()
                 detections = outputs[:, :7]
