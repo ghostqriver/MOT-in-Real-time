@@ -77,7 +77,7 @@ pred_file,processed_gt,avg_FPS = tracker.pred_video(exp_file,ckpt,video_path,gt_
 %cd content/BoT-SORT
 import tools.tracker_BS as tracker_BS
 pred_file_BS,processed_gt_BS,avg_FPS_BS = tracker_BS.pred_video(exp_file_BS,ckpt_BS,video_path,gt_path,fuse=True,fp16=True,sta_thres=0.5)
-```shell
+```
 
 5. Use our video processor to reduce training and inference time for bytetrack by reducing the framerate of the videos
 ```shell
