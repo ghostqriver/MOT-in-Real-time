@@ -8,7 +8,7 @@ Get access to our team [report](https://docs.google.com/document/d/1CL5NLqxpi42j
 
 ## How to use
 
-1. Install bytetrack & dependencies
+1.(a) Install bytetrack & dependencies
 ```shell
 !pip3 install cython
 !pip3 install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
@@ -21,12 +21,25 @@ Get access to our team [report](https://docs.google.com/document/d/1CL5NLqxpi42j
 !pip3 install -r requirements.txt
 !python3 setup.py develop
 ```
+1.(b) Install bot-sort & dependencies
+```shell
+%cd /content
+!git clone https://github.com/NirAharon/BoT-SORT.git
+%cd BoT-SORT
+!pip3 install -r requirements.txt
+!pip3 install faiss-cpu
+!pip3 install faiss-gpu
+!python3 setup.py develop
+```
 2. Install our repo
 ```shell
 %cd ..
 !git clone https://github.com/ghostqriver/MOT-in-Real-time.git
 %cd /MOT-in-Real-time/
 !cp 'tracker.py' '/content/ByteTrack/tools'
+!cp 'byte_tracker_yolov7.py' '/content/ByteTrack/yolox/tracker'
+!cp 'demo_track_yolov7.py' '/content/ByteTrack/tools'
+!cp 'tracker_BS.py' '/content/BoT-SORT/tools'
 ```
 
 3.(a) Use our defined video predictor + frame reduce function
