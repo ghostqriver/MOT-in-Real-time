@@ -44,6 +44,7 @@ Get access to our team [report](https://docs.google.com/document/d/1CL5NLqxpi42j
 !cp 'tracker_BS.py' '/content/BoT-SORT/tools'
 ```
 3. Bytetrack
+
 (a) Use our defined video predictor + frame reduce function
 There are two important parameters 
 
