@@ -41,7 +41,7 @@ Get access to our team [report](https://docs.google.com/document/d/1CL5NLqxpi42j
 !cp 'demo_track_yolov7.py' '/content/ByteTrack/tools'
 !cp 'tracker_BS.py' '/content/BoT-SORT/tools'
 ```
-
+3. Bytetrack
 3.(a) Use our defined video predictor + frame reduce function
 There are two important parameters 
 
@@ -54,24 +54,30 @@ note that ```drop_each_frame``` and ```sta_thres``` could not > 0 at the same ti
 %cd /ByteTrack
 import tools.tracker as tracker
 
-exp_file = 'exps/example/mot/yolox_s_mix_det.py'
-ckpt = 'pretrained/bytetrack_s_mot17.pth.tar'
+exp_file = 'exps/example/mot/yolox_s_mix_det.py' # please modify this exp_file name if you change the model
+ckpt = 'pretrained/bytetrack_s_mot17.pth.tar' # please download the model ckpt before you do the prediction
 video_path = # your video path
 gt_path = # your gt path
 pred_file,processed_gt,avg_FPS = tracker.pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True,drop_each_frame=0,sta_thres=0.5)
-
+```shell
+3.(b) use yolov7
+```shell
 #yolov7
 !wget https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7.pt
 !python3 tools/demo_track_yolov7.py --weights yolov7.pt --source /content/MOT-in-Real-time/MOT17-10-FRAMES.mp4
+```shell
 
+4. bot-sort
+```shell
 #bot-sort
 %cd content/BoT-SORT
 import tools.tracker_BS as tracker_BS
 pred_file_BS,processed_gt_BS,avg_FPS_BS = tracker_BS.pred_video(exp_file_BS,ckpt_BS,video_path,gt_path,fuse=True,fp16=True,sta_thres=0.5)
-```
-3.(b) Use our video processor to reduce training and inference time for bytetrack by reducing the framerate of the videos
-from video_process import VideoPreprocessor
 ```shell
+
+5. Use our video processor to reduce training and inference time for bytetrack by reducing the framerate of the videos
+```shell
+from video_process import VideoPreprocessor
 vp = VideoPreprocessor()
 train_folder = 'path/to/train/set' # Works on set of videos
 test_video = 'path/to/test/video'  # and individual videos as well
