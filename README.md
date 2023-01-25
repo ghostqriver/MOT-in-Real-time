@@ -6,6 +6,10 @@ The project's goal is to improve the [bytetrack](https://github.com/ifzhang/Byte
 
 Get access to our team [report](https://docs.google.com/document/d/1CL5NLqxpi42jAJE1RuJuDSf8qFIHfQXw/edit?usp=sharing&ouid=109729230889422611512&rtpof=true&sd=true).
 
+## Colab example
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1w_4PgAOQ-biOVtb2UCGuL2stxI_eCBpu?usp=sharing)
+
 ## How to use
 
 1. Install
@@ -103,6 +107,3 @@ The ```plot_results``` method requires three parameter inputs: the calculated me
 
 
 
-## Colab example
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1w_4PgAOQ-biOVtb2UCGuL2stxI_eCBpu?usp=sharing)
