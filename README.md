@@ -8,7 +8,9 @@ Get access to our team [report](https://docs.google.com/document/d/1CL5NLqxpi42j
 
 ## How to use
 
-1.(a) Install bytetrack & dependencies
+1. Install
+
+(a) Install bytetrack & dependencies
 ```shell
 !pip3 install cython
 !pip3 install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
@@ -21,7 +23,7 @@ Get access to our team [report](https://docs.google.com/document/d/1CL5NLqxpi42j
 !pip3 install -r requirements.txt
 !python3 setup.py develop
 ```
-1.(b) Install bot-sort & dependencies
+(b) Install bot-sort & dependencies
 ```shell
 %cd /content
 !git clone https://github.com/NirAharon/BoT-SORT.git
@@ -31,7 +33,7 @@ Get access to our team [report](https://docs.google.com/document/d/1CL5NLqxpi42j
 !pip3 install faiss-gpu
 !python3 setup.py develop
 ```
-2. Install our repo
+2. Download our repo
 ```shell
 %cd ..
 !git clone https://github.com/ghostqriver/MOT-in-Real-time.git
@@ -42,7 +44,7 @@ Get access to our team [report](https://docs.google.com/document/d/1CL5NLqxpi42j
 !cp 'tracker_BS.py' '/content/BoT-SORT/tools'
 ```
 3. Bytetrack
-3.(a) Use our defined video predictor + frame reduce function
+(a) Use our defined video predictor + frame reduce function
 There are two important parameters 
 
 ```drop_each_frame```: integer, when > 0, the frame would be reduced each ```drop_each_frame``` frames.
@@ -59,13 +61,14 @@ ckpt = 'pretrained/bytetrack_s_mot17.pth.tar' # please download the model ckpt b
 video_path = # your video path
 gt_path = # your gt path
 pred_file,processed_gt,avg_FPS = tracker.pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True,drop_each_frame=0,sta_thres=0.5)
-```shell
-3.(b) use yolov7
+```
+
+(b) use yolov7
 ```shell
 #yolov7
 !wget https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7.pt
 !python3 tools/demo_track_yolov7.py --weights yolov7.pt --source /content/MOT-in-Real-time/MOT17-10-FRAMES.mp4
-```shell
+```
 
 4. bot-sort
 ```shell
@@ -85,10 +88,10 @@ target_fps = 15 # reduce the original 30 fps videos to 15 fps
 train_output_dict = vp.process_folder(train_folder, target_fps)  
 test_output = vp.process_video(test_video, target_fps)
 ...
-  run the bytetrack on the results
+  run the bytetrack or any MOT model on the results
 ...
 ```
-4. Calculate and plot metrics
+6. Calculate and plot metrics
 
   To calculate some multiple object tracking metrics and to plot the calculation results, use the ```calculate_metrics_for_output``` and the ```plot_results``` method accordingly, from ```calc_metrics.py``` . The metrics have been aligned with what is reported by [MOTChallenge](https://motchallenge.net/) benchmarks. In the metric calculation procedure the ```motmetrics``` open source, third party library was used. Link to repo: https://github.com/cheind/py-motmetrics . For plotting,  the popular```matplotlib``` library was used. Link to repo: https://github.com/matplotlib/matplotlib .
 
