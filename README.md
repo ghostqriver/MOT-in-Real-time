@@ -59,6 +59,15 @@ ckpt = 'pretrained/bytetrack_s_mot17.pth.tar'
 video_path = # your video path
 gt_path = # your gt path
 pred_file,processed_gt,avg_FPS = tracker.pred_video(exp_file,ckpt,video_path,gt_path,fuse=True,fp16=True,drop_each_frame=0,sta_thres=0.5)
+
+#yolov7
+!wget https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7.pt
+!python3 tools/demo_track_yolov7.py --weights yolov7.pt --source /content/MOT-in-Real-time/MOT17-10-FRAMES.mp4
+
+#bot-sort
+%cd content/BoT-SORT
+import tools.tracker_BS as tracker_BS
+pred_file_BS,processed_gt_BS,avg_FPS_BS = tracker_BS.pred_video(exp_file_BS,ckpt_BS,video_path,gt_path,fuse=True,fp16=True,sta_thres=0.5)
 ```
 3.(b) Use our video processor to reduce training and inference time for bytetrack by reducing the framerate of the videos
 from video_process import VideoPreprocessor
